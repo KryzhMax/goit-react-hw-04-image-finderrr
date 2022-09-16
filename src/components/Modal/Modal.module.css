@@ -12,6 +12,18 @@
 }
 
 .Modal {
+  position: absolute;
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 24px);
+}
+
+.close {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  fill: rgb(173, 101, 75);
+}
+
+.close:hover {
+  fill: orangered;
 }

@@ -2,12 +2,18 @@ import React from 'react';
 import s from './ImageGallery.module.css';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 
-const ImageGallery = ({ hits }) => {
-  console.log(hits);
+const ImageGallery = ({ hits, callback }) => {
+  // console.log(callback);
   return (
     <ul className={s.ImageGallery}>
-      {hits.map(({ id, webformatURL, tags }) => (
-        <ImageGalleryItem id={id} webformatURL={webformatURL} tags={tags} />
+      {hits.map(({ id, webformatURL, tags, largeImageURL }) => (
+        <ImageGalleryItem
+          id={id}
+          webformatURL={webformatURL}
+          largeImageURL={largeImageURL}
+          tags={tags}
+          callback={callback}
+        />
       ))}
     </ul>
   );
