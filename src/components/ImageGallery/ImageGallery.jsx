@@ -12,7 +12,6 @@ const ImageGallery = ({ hits, callback }) => {
           webformatURL={webformatURL}
           largeImageURL={largeImageURL}
           tags={tags}
-          callback={callback}
         />
       ))}
     </ul>

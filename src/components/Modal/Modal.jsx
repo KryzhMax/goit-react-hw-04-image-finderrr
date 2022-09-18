@@ -13,27 +13,21 @@ class Modal extends Component {
 
   closeByEsc = ({ code }) => {
     if (code === 'Escape') {
-      this.props.onClick();
+      this.props.onClose();
     }
   };
 
   closeByBackdrop = event => {
     if (event.target === event.currentTarget) {
-      this.props.onClick();
+      this.props.onClose();
     }
   };
 
   render() {
     // console.log(this.props.children);
     return (
-      <div className={s.Overlay} onClose={this.closeByBackdrop}>
+      <div className={s.Overlay} onClick={this.closeByBackdrop}>
         <ModalContent children={this.props.children} />
-        {/* <div className={s.Modal}>
-          <img src={this.props.largeImageURL} alt={this.props.tags} />
-          <button className={s.close} onClick={this.props.toggleModal}>
-            Close
-          </button>
-        </div> */}
       </div>
     );
   }

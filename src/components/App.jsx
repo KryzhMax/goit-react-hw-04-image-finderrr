@@ -7,7 +7,6 @@ import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
-// import Modal from './Modal/Modal';
 
 axios.defaults.baseURL = 'https://pixabay.com/api/';
 const API_KEY = '29242944-2879824970b1213bb04dbe691';
@@ -24,7 +23,7 @@ export class App extends Component {
   };
 
   getImages = (v, p) => {
-    this.setState({ isLoading: true });
+    // this.setState({ isLoading: true });
     console.log('page', this.state.page);
     return axios(
       `/?key=${API_KEY}&q=${v || this.state.value}&image_type=photo&per_page=${
@@ -78,21 +77,10 @@ export class App extends Component {
   }
   onLoadMore = () => {
     this.setNewImages();
+
     // this.setState(prevState => ({ page: prevState.page + 1 }));
     // console.log(this.state.page);
   };
-
-  // openModal = ({ hits: { largeImageURL } }) => {
-  //   this.setState({ currentImage: largeImageURL });
-  // };
-  openModal = ({ hits }) => {
-    console.log(hits.webformatURL);
-    // this.setState({ currentImage: hits.largeImageURL });
-  };
-
-  // closeModal = () => {
-  //   this.setState({ currentImage: null });
-  // };
 
   notify = () =>
     toast('That is all we got!', {
@@ -107,14 +95,14 @@ export class App extends Component {
 
   render() {
     const { isLoading, hits } = this.state;
-
+    console.log(isLoading);
     return (
       <div className="App">
         <Searchbar onSubmit={this.sendSearchQuery} />
-        <ImageGallery hits={hits} callback={this.openModal} />
+        <ImageGallery hits={hits} />
         {/* <Button onClick={this.notify}>Notify </Button> */}
         {!isLoading && <Button title="Load More" onClick={this.onLoadMore} />}
-        {!isLoading && <Loader />}
+        {isLoading && <Loader />}
         <ToastContainer
           position="top-right"
           autoClose={2000}

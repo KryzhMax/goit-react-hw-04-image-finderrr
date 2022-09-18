@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import s from './ImageGalleryItem.module.css';
 import Modal from '../Modal/Modal';
-import ModalContent from '../ModalContent/ModalContent';
 
 class ImageGalleryItem extends Component {
   state = {
@@ -22,7 +21,7 @@ class ImageGalleryItem extends Component {
       largeImageURL,
       tags,
     };
-    // console.log(callback);
+
     return (
       <>
         <li key={id} className={s.ImageGalleryItem} onClick={this.toggleModal}>
@@ -33,16 +32,7 @@ class ImageGalleryItem extends Component {
           />
         </li>
 
-        {showModal && (
-          <Modal onClose={this.toggleModal}>
-            {children}
-            {/* <ModalContent
-              toggleModal={this.toggleModal}
-              largeImageURL={largeImageURL}
-              tags={tags}
-            /> */}
-          </Modal>
-        )}
+        {showModal && <Modal onClose={this.toggleModal}>{children}</Modal>}
       </>
     );
   }
