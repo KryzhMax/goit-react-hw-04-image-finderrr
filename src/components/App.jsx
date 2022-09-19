@@ -85,7 +85,6 @@ export class App extends Component {
   };
 
   notify = res => {
-    // console.log(1111, res);
     toast.info(`We found ${res}`, {
       position: 'top-right',
       autoClose: 2000,
