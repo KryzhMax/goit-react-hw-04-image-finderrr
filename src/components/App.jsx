@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import Searchbar from './Searchbar/Searchbar';
+import SearchBar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
@@ -19,12 +19,12 @@ export class App extends Component {
     hits: [],
     isLoading: false,
     error: null,
-    // currentImage: null,
+    totalHits: null,
   };
 
   getImages = async (v, p) => {
     this.setState({ isLoading: true });
-    console.log('page', this.state.page);
+
     const res = await axios(
       `/?key=${API_KEY}&q=${v || this.state.value}&image_type=photo&per_page=${
         this.state.per_page
@@ -32,7 +32,21 @@ export class App extends Component {
     ).then(res => {
       return res;
     });
-    this.setState({ isLoading: false });
+
+    if (this.state.page === 1) {
+      if (+res.data.totalHits === 0) {
+        this.setState({ error: true });
+        this.notify(`${this.state.value} is not found...`);
+      } else {
+        this.notify(res.data.totalHits);
+        this.setState({ totalHits: res.data.totalHits });
+      }
+    }
+
+    this.setState({
+      isLoading: false,
+      // totalHits: res.data.totalHits,
+    });
     return res;
   };
 
@@ -45,45 +59,34 @@ export class App extends Component {
       }));
   }
 
-  // componentDidUpdate(_, prevState) {
-  //   console.log(prevState.page);
-  //   console.log(this.state.page);
-  //   if (prevState.page !== this.page && this.page !== 1) {
-  //     // this.setState(prevState => ({
-  //     //   value:
-  //     return this.getImages(this.state.value);
-  //     // }));
-  //   }
-  // }
   sendSearchQuery = value => {
     this.setState({ value, page: 1, hits: [] });
     this.setNewImages(value, 1);
-    // this.getImages(value, 1).then(response => {
-    //   this.setState(prevState => ({
-    //     hits: response.data.hits,
-    //     page: prevState.page + 1,
-    //   }));
-    // });
-    // console.log(value);
   };
 
   setNewImages(value, p) {
     this.getImages(value, p).then(response => {
+      // console.log(response.data.totalHits);
       this.setState(prevState => ({
         hits: [...prevState.hits, ...response.data.hits],
         page: prevState.page + 1,
       }));
+      // ? (console.log('state'),
+      //   this.setState(prevState => ({
+      //     hits: [...prevState.hits, ...response.data.hits],
+      //     page: prevState.page + 1,
+      //   })))
+      // : (console.log('errorr'),
+      //   this.notify(`${this.state.value} is not found...`));
     });
   }
   onLoadMore = () => {
     this.setNewImages();
-
-    // this.setState(prevState => ({ page: prevState.page + 1 }));
-    // console.log(this.state.page);
   };
 
-  notify = () =>
-    toast('That is all we got!', {
+  notify = res => {
+    // console.log(1111, res);
+    toast.info(`We found ${res}`, {
       position: 'top-right',
       autoClose: 2000,
       hideProgressBar: false,
@@ -92,37 +95,34 @@ export class App extends Component {
       draggable: true,
       progress: undefined,
     });
+  };
 
   render() {
-    const { isLoading, hits } = this.state;
-    console.log(isLoading);
+    const { isLoading, hits, totalHits, error } = this.state;
+    // console.log(this.totalHits);
     return (
       <div className="App">
-        <Searchbar onSubmit={this.sendSearchQuery} />
+        <SearchBar onSubmit={this.sendSearchQuery} />
         <ImageGallery hits={hits} />
-        {/* <Button onClick={this.notify}>Notify </Button> */}
-        {!!hits.length && (
+        {hits.length && hits.length + 1 <= totalHits ? (
           <Button title="Load More" onClick={this.onLoadMore} />
+        ) : (
+          ''
         )}
         {isLoading && <Loader />}
-        <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-        {/* {currentImage && (
-          <Modal
-            value={hits.tags}
-            largeImageURL={hits.largeImageURL}
-            onClick={this.closeModal}
+        {(error || totalHits) && (
+          <ToastContainer
+            position="top-right"
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
           />
-        )} */}
+        )}
       </div>
     );
   }

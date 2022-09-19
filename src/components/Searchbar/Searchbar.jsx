@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import s from './Searchbar.module.css';
 
-class Searchbar extends Component {
+class SearchBar extends Component {
   state = {
     value: '',
   };
@@ -41,4 +41,4 @@ class Searchbar extends Component {
   }
 }
 
-export default Searchbar;
+export default SearchBar;
