@@ -45,7 +45,6 @@ export class App extends Component {
 
     this.setState({
       isLoading: false,
-      // totalHits: res.data.totalHits,
     });
     return res;
   };
@@ -66,18 +65,10 @@ export class App extends Component {
 
   setNewImages(value, p) {
     this.getImages(value, p).then(response => {
-      // console.log(response.data.totalHits);
       this.setState(prevState => ({
         hits: [...prevState.hits, ...response.data.hits],
         page: prevState.page + 1,
       }));
-      // ? (console.log('state'),
-      //   this.setState(prevState => ({
-      //     hits: [...prevState.hits, ...response.data.hits],
-      //     page: prevState.page + 1,
-      //   })))
-      // : (console.log('errorr'),
-      //   this.notify(`${this.state.value} is not found...`));
     });
   }
   onLoadMore = () => {
@@ -98,7 +89,6 @@ export class App extends Component {
 
   render() {
     const { isLoading, hits, totalHits, error } = this.state;
-    // console.log(this.totalHits);
     return (
       <div className="App">
         <SearchBar onSubmit={this.sendSearchQuery} />
