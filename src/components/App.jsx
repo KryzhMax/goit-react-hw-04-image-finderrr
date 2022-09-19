@@ -22,27 +22,27 @@ export class App extends Component {
     // currentImage: null,
   };
 
-  getImages = (v, p) => {
-    // this.setState({ isLoading: true });
+  getImages = async (v, p) => {
+    this.setState({ isLoading: true });
     console.log('page', this.state.page);
-    return axios(
+    const res = await axios(
       `/?key=${API_KEY}&q=${v || this.state.value}&image_type=photo&per_page=${
         this.state.per_page
       }&page=${p || this.state.page}`
-    )
-      .then(res => {
-        return res;
-      })
-      .finally(this.setState({ isLoading: false }));
+    ).then(res => {
+      return res;
+    });
+    this.setState({ isLoading: false });
+    return res;
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     this.value &&
-      this.getImages(this.state.value || '').then(resp => {
+      (await this.getImages(this.state.value || '').then(resp => {
         this.setState({
           hits: resp.data.hits,
         });
-      });
+      }));
   }
 
   // componentDidUpdate(_, prevState) {
@@ -101,7 +101,9 @@ export class App extends Component {
         <Searchbar onSubmit={this.sendSearchQuery} />
         <ImageGallery hits={hits} />
         {/* <Button onClick={this.notify}>Notify </Button> */}
-        {!isLoading && <Button title="Load More" onClick={this.onLoadMore} />}
+        {!!hits.length && (
+          <Button title="Load More" onClick={this.onLoadMore} />
+        )}
         {isLoading && <Loader />}
         <ToastContainer
           position="top-right"
