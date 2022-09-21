@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -11,71 +11,56 @@ import Loader from './Loader/Loader';
 axios.defaults.baseURL = 'https://pixabay.com/api/';
 const API_KEY = '29242944-2879824970b1213bb04dbe691';
 
-export class App extends Component {
-  state = {
-    value: '',
-    page: 1,
-    per_page: 12,
-    hits: [],
-    isLoading: false,
-    error: null,
-    totalHits: null,
-  };
-
-  getImages = async (v, p) => {
-    this.setState({ isLoading: true });
+export const App = () => {
+  const [value, setValue] = useState('');
+  const [page, setPage] = useState(1);
+  const [hits, setHits] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [totalHits, setTotalHits] = useState(null);
+  const getImages = async (v, p) => {
+    setIsLoading(true);
 
     const res = await axios(
-      `/?key=${API_KEY}&q=${v || this.state.value}&image_type=photo&per_page=${
-        this.state.per_page
-      }&page=${p || this.state.page}`
+      `/?key=${API_KEY}&q=${value}&image_type=photo&per_page=12&page=${page}`
     ).then(res => {
       return res;
     });
 
-    if (this.state.page === 1) {
+    if (page === 1) {
       if (+res.data.totalHits === 0) {
-        this.setState({ error: true });
-        this.notify(`${this.state.value} is not found...`);
+        setError(true);
+        notify(`${value} is not found...`);
       } else {
-        this.notify(res.data.totalHits);
-        this.setState({ totalHits: res.data.totalHits });
+        notify(res.data.totalHits);
+        setTotalHits(res.data.totalHits);
       }
     }
-
-    this.setState({
-      isLoading: false,
-    });
+    setHits(prev => [...prev, ...res.data.hits]);
+    setIsLoading(false);
     return res;
   };
 
-  async componentDidMount() {
-    this.value &&
-      (await this.getImages(this.state.value || '').then(resp => {
-        this.setState({
-          hits: resp.data.hits,
-        });
-      }));
-  }
+  useEffect(() => {
+    value && getImages(value, page);
+    // eslint-disable-next-line
+  }, [value, page]);
 
-  sendSearchQuery = value => {
-    this.setState({ value, page: 1, hits: [] });
-    this.setNewImages(value, 1);
+  const setNewImages = (value, p) => {
+    setPage(page + 1);
   };
 
-  setNewImages(value, p) {
-    this.getImages(value, p).then(response => {
-      this.setState(prevState => ({
-        hits: [...prevState.hits, ...response.data.hits],
-        page: prevState.page + 1,
-      }));
-    });
-  }
-  onLoadMore = () => {
-    this.setNewImages();
+  const sendSearchQuery = value => {
+    setValue(value);
+    setPage(1);
+    setHits([]);
   };
 
-  notify = res => {
+  const onLoadMore = () => {
+    setNewImages();
+  };
+
+  function notify(res) {
     toast.info(`We found ${res}`, {
       position: 'top-right',
       autoClose: 2000,
@@ -85,34 +70,31 @@ export class App extends Component {
       draggable: true,
       progress: undefined,
     });
-  };
-
-  render() {
-    const { isLoading, hits, totalHits, error } = this.state;
-    return (
-      <div className="App">
-        <SearchBar onSubmit={this.sendSearchQuery} />
-        <ImageGallery hits={hits} />
-        {hits.length && hits.length + 1 <= totalHits ? (
-          <Button title="Load More" onClick={this.onLoadMore} />
-        ) : (
-          ''
-        )}
-        {isLoading && <Loader />}
-        {(error || totalHits) && (
-          <ToastContainer
-            position="top-right"
-            autoClose={2000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-        )}
-      </div>
-    );
   }
-}
+
+  return (
+    <div className="App">
+      <SearchBar callback={sendSearchQuery} />
+      <ImageGallery hits={hits} />
+      {hits.length && hits.length + 1 <= totalHits ? (
+        <Button title="Load More" onClick={onLoadMore} />
+      ) : (
+        ''
+      )}
+      {isLoading && <Loader />}
+      {(error || totalHits) && (
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      )}
+    </div>
+  );
+};
